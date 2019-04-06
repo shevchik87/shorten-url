@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Shorten url</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+    <a class="navbar-brand" href="/">Shorten-Url</a>
+
+</nav>
+
+<main role="main" class="container">
+    <div class="jumbotron">
+        {{if .ShortUrl}}
+            <h1>Short URL</h1>
+            <h3>{{.ShortUrl}}</h3>
+        {{else}}
+            <h1 class="cent">Shorten</h1>
+            <form method="post" action="/" name="shortUrlForm" onsubmit="return validateForm()">
+                <div class="input-group mb-3">
+                    <input oninput="changeUrl()"  type="text" name="long-url" class="form-control" placeholder="Input your url" required>
+                    <div class="input-group-append">
+                        <input type="submit" class="btn btn-primary">
+                    </div>
+                    <div class="invalid-feedback">
+                        Please provide a valid url.
+                    </div>
+                </div>
+            </form>
+        {{end}}
+    </div>
+</main>
+<script>
+    function validateForm() {
+        let inputUrl = document.forms["shortUrlForm"]["long-url"];
+        if (!validURL(inputUrl.value)) {
+            inputUrl.classList.add("is-invalid")
+            return false;
+        }
+    }
+    function validURL(str) {
+        let pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+                '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+                '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+                '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+                '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+                '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+        return !!pattern.test(str);
+    }
+    function changeUrl() {
+        let inputUrl = document.forms["shortUrlForm"]["long-url"];
+        if (inputUrl.classList.contains("is-invalid")) {
+            inputUrl.classList.remove("is-invalid")
+        }
+    }
+</script>
+</body>
+</html>
