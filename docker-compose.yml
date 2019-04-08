@@ -1,0 +1,18 @@
+version: "2"
+
+services:
+  app:
+    image: golang:1.12.1-alpine
+    ports:
+      - 80:80
+    volumes:
+      - .:/go/src/github.com/shevchik87/shorten-url
+    working_dir: /go/src/github.com/shevchik87/shorten-url
+    command: go run main.go
+    links:
+      - mongo
+    environment:
+      MONGODB_URL: mongodb://mongo:27017
+
+  mongo:
+    image: mongo

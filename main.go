@@ -13,6 +13,7 @@ import (
 	"log"
 	"fmt"
 	"context"
+	"os"
 )
 
 type InputLongUrl struct {
@@ -26,9 +27,8 @@ type ResponceUrl struct {
 }
 
 type Url struct {
-	LongUrl string
-	ShortUrl string
-	ShortHash string
+	OriginUrl string
+	Hash string
 }
 
 
@@ -36,7 +36,7 @@ const BASE_URL  = "http://127.0.0.1/"
 
 func main() {
 
-	client, err := mongo.Connect(context.TODO(), "mongodb://localhost:27017")
+	client, err := mongo.Connect(context.TODO(), os.Getenv("MONGODB_URL"))
 
 	if err != nil {
 		log.Fatal(err)
@@ -54,7 +54,7 @@ func main() {
 
 
 	r := mux.NewRouter()
-	tmpl := template.Must(template.ParseFiles("shevchik87/shorten-url/index.html"))
+	tmpl := template.Must(template.ParseFiles("index.html"))
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			tmpl.Execute(w, nil)
@@ -74,7 +74,7 @@ func main() {
 
 		} else {
 			dataResponse.ShortUrl = BASE_URL+shortHash
-			filter := bson.D{{"shorthash", shortHash}}
+			filter := bson.D{{"hash", shortHash}}
 			var result Url
 
 			err = collection.FindOne(context.TODO(), filter).Decode(&result)
@@ -82,7 +82,7 @@ func main() {
 				log.Println(err)
 			}
 			if (Url{}) == result{
-				dataToInsert := Url{dataResponse.LongUrl, dataResponse.ShortUrl, shortHash}
+				dataToInsert := Url{dataResponse.LongUrl, shortHash}
 				_, err := collection.InsertOne(context.TODO(), dataToInsert)
 				if err != nil {
 					log.Fatal(err)
@@ -98,7 +98,7 @@ func main() {
 		vars := mux.Vars(r)
 		hash := vars["hash"]
 
-		filter := bson.D{{"shorthash", hash}}
+		filter := bson.D{{"hash", hash}}
 		var result Url
 
 		err = collection.FindOne(context.TODO(), filter).Decode(&result)
@@ -106,7 +106,7 @@ func main() {
 			w.WriteHeader(404)
 			return
 		}
-		http.Redirect(w, r, result.LongUrl, 301)
+		http.Redirect(w, r, result.OriginUrl, 301)
 
 	})
 
