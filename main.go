@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"context"
 	"os"
+	"time"
 )
 
 type InputLongUrl struct {
@@ -29,13 +30,14 @@ type ResponceUrl struct {
 type Url struct {
 	OriginUrl string
 	Hash string
+	Created string
 }
 
 
-const BASE_URL  = "http://127.0.0.1/"
 
 func main() {
 
+	var baseTinyUrl = os.Getenv("BASE_TINY_URL")
 	client, err := mongo.Connect(context.TODO(), os.Getenv("MONGODB_URL"))
 
 	if err != nil {
@@ -73,7 +75,7 @@ func main() {
 			dataResponse.ShortUrl = shortHash
 
 		} else {
-			dataResponse.ShortUrl = BASE_URL+shortHash
+			dataResponse.ShortUrl = baseTinyUrl+shortHash
 			filter := bson.D{{"hash", shortHash}}
 			var result Url
 
@@ -81,8 +83,9 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
+			var currentTime = time.Now()
 			if (Url{}) == result{
-				dataToInsert := Url{dataResponse.LongUrl, shortHash}
+				dataToInsert := Url{dataResponse.LongUrl, shortHash, currentTime.Format("2006-01-02 15:04:05")}
 				_, err := collection.InsertOne(context.TODO(), dataToInsert)
 				if err != nil {
 					log.Fatal(err)

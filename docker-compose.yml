@@ -13,6 +13,7 @@ services:
       - mongo
     environment:
       MONGODB_URL: mongodb://mongo:27017
+      BASE_TINY_URL: http://127.0.0.1/
 
   mongo:
     image: mongo
