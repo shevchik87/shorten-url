@@ -118,7 +118,6 @@
     "github.com/gorilla/mux",
     "github.com/mongodb/mongo-go-driver/bson",
     "github.com/mongodb/mongo-go-driver/mongo",
-    "github.com/mongodb/mongo-go-driver/mongo/options",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

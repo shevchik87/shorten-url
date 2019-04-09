@@ -10,6 +10,7 @@ services:
     working_dir: /go/src/github.com/shevchik87/shorten-url
     command: go run main.go
     links:
+
       - mongo
     environment:
       MONGODB_URL: mongodb://mongo:27017
